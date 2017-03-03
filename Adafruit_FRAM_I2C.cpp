@@ -114,8 +114,7 @@ uint8_t Adafruit_FRAM_I2C::read8 (uint16_t framAddr)
                   the MB85RC256V.
 */
 /**************************************************************************/
-#if 0
-void Adafruit_FRAM_I2C::getDeviceID(uint16_t *manufacturerID, uint16_t *productID)
+bool Adafruit_FRAM_I2C::getDeviceID(DeviceInfo& Info)
 {
   uint8_t a[3] = { 0, 0, 0 };
   uint8_t results;
@@ -131,7 +130,8 @@ void Adafruit_FRAM_I2C::getDeviceID(uint16_t *manufacturerID, uint16_t *productI
 
   /* Shift values to separate manuf and prod IDs */
   /* See p.10 of http://www.fujitsu.com/downloads/MICRO/fsa/pdf/products/memory/fram/MB85RC256V-DS501-00017-3v0-E.pdf */
-  *manufacturerID = (a[0] << 4) + (a[1]  >> 4);
-  *productID = ((a[1] & 0x0F) << 8) + a[2];
+  Info.uMfg = (a[0] << 4) + (a[1]  >> 4);
+  Info.uProduct = ((a[1] & 0x0F) << 8) + a[2];
+
+  return true;
 }
-#endif

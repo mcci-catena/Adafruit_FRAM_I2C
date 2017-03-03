@@ -55,6 +55,14 @@ class Adafruit_FRAM_I2C {
   void     write8 (uint16_t framAddr, uint8_t value);
   uint8_t  read8  (uint16_t framAddr);
 
+  struct DeviceInfo
+ 	{
+	uint16_t uMfg;
+	uint16_t uProduct;
+	};
+
+  bool getDeviceID(DeviceInfo& Info);
+
  private:
   uint8_t i2c_addr;
   boolean _framInitialised;
