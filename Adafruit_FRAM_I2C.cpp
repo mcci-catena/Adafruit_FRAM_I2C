@@ -33,7 +33,7 @@
 /**************************************************************************/
 Adafruit_FRAM_I2C::Adafruit_FRAM_I2C(void) 
 {
-  _framInitialised = false;
+  this->_framInitialised = false;
 }
 
 /*========================================================================*/
@@ -46,26 +46,12 @@ Adafruit_FRAM_I2C::Adafruit_FRAM_I2C(void)
     doing anything else)
 */
 /**************************************************************************/
-boolean Adafruit_FRAM_I2C::begin(uint8_t addr) 
+boolean Adafruit_FRAM_I2C::begin(uint8_t addr)
 {
-  i2c_addr = addr;
+  this->i2c_addr = addr;
   Wire.begin();
   
-  /* Make sure we're actually connected */
-  uint16_t manufID, prodID;
-  getDeviceID(&manufID, &prodID);
-  if (manufID != 0x00A)
-  {
-    //Serial.print("Unexpected Manufacturer ID: 0x");
-    //Serial.println(manufID, HEX);
-    return false;
-  }
-  if (prodID != 0x510)
-  {
-    //Serial.print("Unexpected Product ID: 0x");
-    //Serial.println(prodID, HEX);
-    return false;
-  }
+  /* Make sure we're actually connected -- no good way to do this! */
 
   /* Everything seems to be properly initialised and connected */
   _framInitialised = true;
@@ -87,8 +73,7 @@ boolean Adafruit_FRAM_I2C::begin(uint8_t addr)
 /**************************************************************************/
 void Adafruit_FRAM_I2C::write8 (uint16_t framAddr, uint8_t value)
 {
-  Wire.beginTransmission(i2c_addr);
-  Wire.write(framAddr >> 8);
+  Wire.beginTransmission(i2c_addr + ((framAddr >> 8) & 0x7));
   Wire.write(framAddr & 0xFF);
   Wire.write(value);
   Wire.endTransmission();
@@ -108,8 +93,7 @@ void Adafruit_FRAM_I2C::write8 (uint16_t framAddr, uint8_t value)
 /**************************************************************************/
 uint8_t Adafruit_FRAM_I2C::read8 (uint16_t framAddr)
 {
-  Wire.beginTransmission(i2c_addr);
-  Wire.write(framAddr >> 8);
+  Wire.beginTransmission(i2c_addr + ((framAddr >> 8) & 0x7));
   Wire.write(framAddr & 0xFF);
   Wire.endTransmission();
 
@@ -130,6 +114,7 @@ uint8_t Adafruit_FRAM_I2C::read8 (uint16_t framAddr)
                   the MB85RC256V.
 */
 /**************************************************************************/
+#if 0
 void Adafruit_FRAM_I2C::getDeviceID(uint16_t *manufacturerID, uint16_t *productID)
 {
   uint8_t a[3] = { 0, 0, 0 };
@@ -149,3 +134,4 @@ void Adafruit_FRAM_I2C::getDeviceID(uint16_t *manufacturerID, uint16_t *productI
   *manufacturerID = (a[0] << 4) + (a[1]  >> 4);
   *productID = ((a[1] & 0x0F) << 8) + a[2];
 }
+#endif
