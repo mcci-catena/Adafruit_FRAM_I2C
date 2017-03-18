@@ -2,12 +2,14 @@
 /*! 
     @file     Adafruit_FRAM_I2C.h
     @author   KTOWN (Adafruit Industries)
+    @author   Terry Moore (MCCI Corporation)
 
     @section LICENSE
 
     Software License Agreement (BSD License)
 
     Copyright (c) 2013, Adafruit Industries
+    Portions copyright (c) 2017, MCCI Corporation
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -36,6 +38,8 @@
 #ifndef _ADAFRUIT_FRAM_I2C_H_
 #define _ADAFRUIT_FRAM_I2C_H_
 
+#pragma once
+
 #if ARDUINO >= 100
  #include <Arduino.h>
 #else
@@ -50,10 +54,24 @@
 class Adafruit_FRAM_I2C {
  public:
   Adafruit_FRAM_I2C(void);
-  
-  boolean  begin(uint8_t addr = MB85RC_DEFAULT_ADDRESS);
+
+  // set up and probe device  
+  boolean  begin(
+		uint8_t addr = MB85RC_DEFAULT_ADDRESS, 
+		TwoWire *pWire = &Wire
+		);
+
+  // write a single byte
   void     write8 (uint16_t framAddr, uint8_t value);
+
+  // write a buffer
+  void     write  (uint16_t framAddr, uint8_t const *pBuffer, size_t nBuffer);
+
+  // read a single byte
   uint8_t  read8  (uint16_t framAddr);
+
+  // read a buffer
+  uint8_t   read   (uint16_t framAddr, uint8_t *pBuffer, size_t nBuffer);
 
   struct DeviceInfo
  	{
@@ -64,8 +82,13 @@ class Adafruit_FRAM_I2C {
   bool getDeviceID(DeviceInfo& Info);
 
  private:
-  uint8_t i2c_addr;
-  boolean _framInitialised;
+  uint8_t m_i2c_addr;
+  boolean m_framInitialized;
+  TwoWire *m_pWire;
+
+  void prepIO(void) const;
+  uint8_t getI2cAddr(uint16_t framAddr) const;
+  
 };
 
 #endif
