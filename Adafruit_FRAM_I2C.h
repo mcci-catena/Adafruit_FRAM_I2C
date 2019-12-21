@@ -40,96 +40,12 @@
 
 #pragma once
 
-#if ARDUINO >= 100
- #include <Arduino.h>
-#else
- #include <WProgram.h>
-#endif
+// this is a compatibility wrapper.  Call the base file.
+#include "MCCI_FRAM_I2C.h"
 
-#include <Wire.h>
-#include <cstdint>
+using Adafruit_FRAM_I2C = MCCI_FRAM_I2C;
 
-#define MB85RC_DEFAULT_ADDRESS        (0x50) /* 1010 + A2 + A1 + A0 = 0x50 default */
-#define MB85RC_SLAVE_ID       (0xF8)
-
-class Adafruit_FRAM_I2C {
- public:
-  Adafruit_FRAM_I2C(void);
-
-  // create a version number for comparison
-  static constexpr std::uint32_t
-  makeVersion(
-      std::uint8_t major, std::uint8_t minor, std::uint8_t patch, std::uint8_t local = 0
-      )
-      {
-      return ((std::uint32_t)major << 24u) | ((std::uint32_t)minor << 16u) | ((std::uint32_t)patch << 8u) | (std::uint32_t)local;
-      }
-
-  // version of library, for use by clients in static_asserts -- set version by editing here:
-  static constexpr std::uint32_t getVersion() { return makeVersion(2,0,0,0); }
-
-  // extract major number from version
-  static constexpr std::uint8_t
-  getMajor(std::uint32_t v)
-      {
-      return std::uint8_t(v >> 24u);
-      }
-
-  // extract minor number from version
-  static constexpr std::uint8_t
-  getMinor(std::uint32_t v)
-      {
-      return std::uint8_t(v >> 16u);
-      }
-
-  // extract patch number from version
-  static constexpr std::uint8_t
-  getPatch(std::uint32_t v)
-      {
-      return std::uint8_t(v >> 8u);
-      }
-
-  // extract local number from version
-  static constexpr std::uint8_t
-  getLocal(std::uint32_t v)
-      {
-      return std::uint8_t(v);
-      }
-
-  // set up and probe device  
-  boolean  begin(
-		uint8_t addr = MB85RC_DEFAULT_ADDRESS, 
-		TwoWire *pWire = &Wire
-		);
-
-  // write a single byte
-  void     write8 (uint16_t framAddr, uint8_t value);
-
-  // write a buffer
-  void     write  (uint16_t framAddr, uint8_t const *pBuffer, size_t nBuffer);
-
-  // read a single byte
-  uint8_t  read8  (uint16_t framAddr);
-
-  // read a buffer
-  uint8_t   read   (uint16_t framAddr, uint8_t *pBuffer, size_t nBuffer);
-
-  struct DeviceInfo
- 	{
-	uint16_t uMfg;
-	uint16_t uProduct;
-	};
-
-  bool getDeviceID(DeviceInfo& Info);
-
- private:
-  uint8_t m_i2c_addr;
-  boolean m_framInitialized;
-  TwoWire *m_pWire;
-
-  void prepIO(void) const;
-  uint8_t getI2cAddr(uint16_t framAddr) const;
-  
-};
+#define MB85RC_DEFAULT_ADDRESS  (Adafruit_FRAM_I2C::MB85RC::kDefaultAddress)
+#define MB85RC_SLAVE_ID         (Adafruit_FRAM_I2C::MB85RC::kSlaveID)
 
 #endif

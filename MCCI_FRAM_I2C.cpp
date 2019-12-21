@@ -1,6 +1,6 @@
 /**************************************************************************/
 /*!
-    @file     Adafruit_FRAM_I2C.cpp
+    @file     MCCI_FRAM_I2C.cpp
     @author   KTOWN (Adafruit Industries)
     @license  BSD (see license.txt)
 
@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "Adafruit_FRAM_I2C.h"
+#include "MCCI_FRAM_I2C.h"
 
 /*========================================================================*/
 /*                            CONSTRUCTORS                                */
@@ -33,17 +33,17 @@
     Constructor
 */
 /**************************************************************************/
-Adafruit_FRAM_I2C::Adafruit_FRAM_I2C(void) 
+MCCI_FRAM_I2C::MCCI_FRAM_I2C(void) 
 {
   this->m_framInitialized = false;
 }
 
-void Adafruit_FRAM_I2C::prepIO(void) const
+void MCCI_FRAM_I2C::prepIO(void) const
 	{
 	// this->m_pWire->setClock(1000000);
 	}
 
-uint8_t Adafruit_FRAM_I2C::getI2cAddr(uint16_t framAddr) const
+uint8_t MCCI_FRAM_I2C::getI2cAddr(uint16_t framAddr) const
 	{
 	return this->m_i2c_addr + ((framAddr >> 8) & 0x7);
 	}
@@ -58,11 +58,11 @@ uint8_t Adafruit_FRAM_I2C::getI2cAddr(uint16_t framAddr) const
     doing anything else)
 */
 /**************************************************************************/
-boolean Adafruit_FRAM_I2C::begin(uint8_t addr, TwoWire *pWire)
+boolean MCCI_FRAM_I2C::begin(uint8_t addr, TwoWire *pWire)
 {
   /* scrub and save the address */
   if (addr == 0) // address of 0 is never valid on i2c.
-	addr = MB85RC_DEFAULT_ADDRESS;
+	addr = MB85RC::kDefaultAddress;
 
   this->m_i2c_addr = addr & ~0x7;
   this->m_pWire = pWire;
@@ -98,7 +98,7 @@ boolean Adafruit_FRAM_I2C::begin(uint8_t addr, TwoWire *pWire)
                 The 8-bit value to write at framAddr
 */
 /**************************************************************************/
-void Adafruit_FRAM_I2C::write8 (uint16_t framAddr, uint8_t value) 
+void MCCI_FRAM_I2C::write8 (uint16_t framAddr, uint8_t value) 
 {
   const uint8_t i2c_addr = this->getI2cAddr(framAddr);
 
@@ -121,7 +121,7 @@ void Adafruit_FRAM_I2C::write8 (uint16_t framAddr, uint8_t value)
                 number of bytes to write.
 */
 /**************************************************************************/
-void Adafruit_FRAM_I2C::write(
+void MCCI_FRAM_I2C::write(
 	uint16_t framAddr, 
 	const uint8_t *pBuffer,
 	size_t nBuffer
@@ -149,7 +149,7 @@ void Adafruit_FRAM_I2C::write(
     @returns    The 8-bit value retrieved at framAddr
 */
 /**************************************************************************/
-uint8_t Adafruit_FRAM_I2C::read8 (uint16_t framAddr)
+uint8_t MCCI_FRAM_I2C::read8 (uint16_t framAddr)
 {
   const uint8_t i2c_addr = this->getI2cAddr(framAddr);
 
@@ -179,7 +179,7 @@ uint8_t Adafruit_FRAM_I2C::read8 (uint16_t framAddr)
     @returns    The 8-bit value retrieved at framAddr
 */
 /**************************************************************************/
-uint8_t Adafruit_FRAM_I2C::read (uint16_t framAddr, uint8_t *pBuffer, size_t nBuffer)
+uint8_t MCCI_FRAM_I2C::read (uint16_t framAddr, uint8_t *pBuffer, size_t nBuffer)
 {
   uint8_t const i2c_addr = this->getI2cAddr(framAddr);
 
@@ -216,16 +216,16 @@ uint8_t Adafruit_FRAM_I2C::read (uint16_t framAddr, uint8_t *pBuffer, size_t nBu
                   the MB85RC256V.
 */
 /**************************************************************************/
-bool Adafruit_FRAM_I2C::getDeviceID(DeviceInfo& Info)
+bool MCCI_FRAM_I2C::getDeviceID(DeviceInfo& Info)
 {
   uint8_t a[3] = { 0, 0, 0 };
   uint8_t results;
   
-  this->m_pWire->beginTransmission(MB85RC_SLAVE_ID >> 1);
+  this->m_pWire->beginTransmission(MB85RC::kSlaveID >> 1);
   this->m_pWire->write(this->m_i2c_addr << 1);
   results = this->m_pWire->endTransmission(false);
 
-  this->m_pWire->requestFrom(MB85RC_SLAVE_ID >> 1, 3);
+  this->m_pWire->requestFrom(MB85RC::kSlaveID >> 1, 3);
   a[0] = this->m_pWire->read();
   a[1] = this->m_pWire->read();
   a[2] = this->m_pWire->read();
