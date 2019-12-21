@@ -32,3 +32,6 @@
 *.BAK
 *.CKP
 emacs.core
+
+# Visual Studio Code
+.vscode
